@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "tetraclient3",
+  "version": "${version}",
+  "name": "TetraClient3",
+  "description": "",
+  "authors": [
+    "stanuwu"
+  ],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/tetraclient3/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "fabric-datagen": [
+      "com.stanuwu.tetraclient3.client.Tetraclient3DataGenerator"
+    ],
+    "client": [
+      "com.stanuwu.tetraclient3.client.Tetraclient3Client"
+    ],
+    "main": [
+      "com.stanuwu.tetraclient3.Tetraclient3"
+    ]
+  },
+  "mixins": [
+    "tetraclient3.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
