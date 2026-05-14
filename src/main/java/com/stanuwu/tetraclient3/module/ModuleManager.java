@@ -3,6 +3,11 @@ package com.stanuwu.tetraclient3.module;
 import com.stanuwu.tetraclient3.module.impl.config.FilesModule;
 import com.stanuwu.tetraclient3.module.impl.hud.WaifuModule;
 import com.stanuwu.tetraclient3.module.impl.hud.WatermarkModule;
+import com.stanuwu.tetraclient3.module.impl.misc.ClientSpoofModule;
+import com.stanuwu.tetraclient3.module.impl.movement.ClipModule;
+import com.stanuwu.tetraclient3.module.impl.movement.FlightModule;
+import com.stanuwu.tetraclient3.module.impl.movement.JesusModule;
+import com.stanuwu.tetraclient3.module.impl.movement.NoFallModule;
 import com.stanuwu.tetraclient3.module.impl.render.PlayerEspModule;
 import lombok.Getter;
 
@@ -17,9 +22,9 @@ public class ModuleManager {
     private static final ModuleManager instance = new ModuleManager();
 
     @Getter
-    private final List<AbstractModule<?>> modules = new ArrayList<>();
+    private final List<AbstractModule> modules = new ArrayList<>();
 
-    private void reg(AbstractModule<?>... module) {
+    private void reg(AbstractModule... module) {
         modules.addAll(List.of(module));
     }
 
@@ -30,8 +35,8 @@ public class ModuleManager {
      * @param <T>   module class type
      * @return module instance
      */
-    public <T extends AbstractModule<T>> T getModule(Class<T> clazz) {
-        for (AbstractModule<?> module : modules) {
+    public <T extends AbstractModule> T getModule(Class<T> clazz) {
+        for (AbstractModule module : modules) {
             if (module.getClass().equals(clazz)) //noinspection unchecked
                 return (T) module;
         }
@@ -42,6 +47,6 @@ public class ModuleManager {
      * Register modules here.
      */
     private ModuleManager() {
-        reg(new PlayerEspModule(), new WatermarkModule(), new WaifuModule(), new FilesModule(this));
+        reg(new PlayerEspModule(), new FlightModule(), new NoFallModule(), new JesusModule(), new ClipModule(), new ClientSpoofModule(), new WatermarkModule(), new WaifuModule(), new FilesModule(this));
     }
 }

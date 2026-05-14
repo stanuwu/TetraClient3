@@ -125,7 +125,7 @@ public class Menu {
         ImGui.dummy(5 * scale, 5 * scale);
 
         // Modules
-        for (AbstractModule<?> module : ModuleManager.getInstance().getModules()) {
+        for (AbstractModule module : ModuleManager.getInstance().getModules()) {
             if (!module.getCategory().equals(selected)) continue;
             ImGui.setWindowFontScale(fontScale * 1.5f);
             ImGui.text(module.getName());

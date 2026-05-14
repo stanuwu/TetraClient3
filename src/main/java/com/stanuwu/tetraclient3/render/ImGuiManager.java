@@ -42,6 +42,9 @@ public class ImGuiManager {
     @Getter
     private ImFont anta = null;
 
+    @Getter
+    private ImFont cherrybomb = null;
+
     private final Menu menu = new Menu();
 
     private long windowHandle = 0;
@@ -119,6 +122,7 @@ public class ImGuiManager {
         addIcons(io, fontConfigRoboto, glyphRangesRoboto);
 
         this.barcode = io.getFonts().addFontFromMemoryTTF(loadFromResources("LibreBarcode128Text-Regular.ttf"), FONT_SIZE);
+        this.cherrybomb = io.getFonts().addFontFromMemoryTTF(loadFromResources("CherryBombOne-Regular.ttf"), FONT_SIZE);
 
         final ImFontGlyphRangesBuilder rangesBuilderAnta = new ImFontGlyphRangesBuilder();
         rangesBuilderAnta.addRanges(io.getFonts().getGlyphRangesDefault());

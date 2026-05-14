@@ -27,7 +27,7 @@ public abstract class AbstractConfigValue<T> {
 
     @Getter
     @Setter
-    private AbstractModule<?> parent = null;
+    private AbstractModule parent = null;
 
     @Getter
     private final String name;

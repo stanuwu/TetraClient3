@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractModule<T extends AbstractModule<T>> {
+public abstract class AbstractModule {
     boolean hasCachedConfigValues = false;
     private final List<AbstractConfigValue<?>> configValues = new ArrayList<>();
     @Getter

@@ -20,7 +20,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FilesModule extends AbstractModule<FilesModule> {
+public class FilesModule extends AbstractModule {
     private enum ConfigFiles {
         DEFAULT,
         CONFIG1,
@@ -66,7 +66,7 @@ public class FilesModule extends AbstractModule<FilesModule> {
             JsonElement json = JsonParser.parseString(Strings.join(Files.readAllLines(Paths.get(path)), ""));
             if (!json.isJsonObject()) return;
             JsonObject object = json.getAsJsonObject();
-            for (AbstractModule<?> module : this.moduleManager.getModules()) {
+            for (AbstractModule module : this.moduleManager.getModules()) {
                 if (!object.has(module.getName())) continue;
                 JsonObject moduleObject = object.getAsJsonObject(module.getName());
                 if (!moduleObject.isJsonObject()) continue;
@@ -84,7 +84,7 @@ public class FilesModule extends AbstractModule<FilesModule> {
 
     private void save() {
         Map<String, Map<String, String>> data = new HashMap<>();
-        for (AbstractModule<?> module : this.moduleManager.getModules()) {
+        for (AbstractModule module : this.moduleManager.getModules()) {
             data.put(module.getName(), module.getConfigMap());
         }
         JsonObject root = new JsonObject();

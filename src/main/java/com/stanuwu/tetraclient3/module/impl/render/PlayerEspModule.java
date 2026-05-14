@@ -17,7 +17,7 @@ import net.minecraft.world.phys.AABB;
 
 import java.awt.*;
 
-public class PlayerEspModule extends AbstractModule<PlayerEspModule> {
+public class PlayerEspModule extends AbstractModule {
     private final CheckboxValue enabled = reg(new CheckboxValue("Enabled", true));
     private final EnumValue<EspType> type = reg(new EnumValue<>("Type", EspType.BOX, EspType.class));
     private final ColorConfigValue color = reg(new ColorConfigValue("Color", Color.RED));

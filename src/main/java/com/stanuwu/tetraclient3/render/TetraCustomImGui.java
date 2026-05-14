@@ -821,7 +821,7 @@ public class TetraCustomImGui {
         value = Math.round(value * 100f) / 100.0f;
 
         // draw badge
-        String valueText = String.valueOf(value);
+        String valueText = String.format("%.2f", value);
         ImVec2 valueSize = ImGui.calcTextSize(valueText);
 
         float badgeScale = 0.7f + (0.3f * badgeAnim);
@@ -1003,7 +1003,7 @@ public class TetraCustomImGui {
         drawList.addCircleFilled(knobX, knobY, knobRadius, knobColor);
 
         // draw badge
-        String valueText = String.valueOf(value);
+        String valueText = String.format("%.0f", (float) value);
         ImVec2 valueSize = ImGui.calcTextSize(valueText);
 
         float badgeScale = 0.7f + (0.3f * badgeAnim);
