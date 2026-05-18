@@ -2,6 +2,6 @@
 
 # TODO
 
-- add packet receive event
-- finish no gui close module
+- aim module
+- silent aim helper
 - add more modules

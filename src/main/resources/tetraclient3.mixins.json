@@ -4,7 +4,8 @@
   "package": "com.stanuwu.tetraclient3.mixin",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
-    "CollisionGetterMixin"
+    "CollisionGetterMixin",
+    "PlayerMixin"
   ],
   "client": [
     "ConnectionMixin",

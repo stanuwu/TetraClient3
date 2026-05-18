@@ -28,8 +28,8 @@ public class ClientSpoofModule extends AbstractModule {
 
     private String getBrand() {
         return switch (this.mode.getValue()) {
-            case LUNAR -> "Lunar-Client";
-            case GEYSER -> "Geyser";
+            case LUNAR -> "lunarclient:v2.21.33-2612";
+            case GEYSER -> "geyser";
             case CUSTOM -> custom.getValue();
         };
     }
