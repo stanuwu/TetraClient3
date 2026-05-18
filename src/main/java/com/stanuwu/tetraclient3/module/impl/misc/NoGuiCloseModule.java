@@ -1,8 +1,11 @@
 package com.stanuwu.tetraclient3.module.impl.misc;
 
 import com.stanuwu.tetraclient3.config.CheckboxValue;
+import com.stanuwu.tetraclient3.events.EventSubscriber;
+import com.stanuwu.tetraclient3.events.impl.ReceivePacketEvent;
 import com.stanuwu.tetraclient3.module.AbstractModule;
 import com.stanuwu.tetraclient3.module.ModuleCategory;
+import net.minecraft.network.protocol.game.ClientboundContainerClosePacket;
 
 public class NoGuiCloseModule extends AbstractModule {
     public NoGuiCloseModule() {
@@ -10,6 +13,11 @@ public class NoGuiCloseModule extends AbstractModule {
     }
 
     private final CheckboxValue enabled = reg(new CheckboxValue("Enabled", false));
+    
+    @EventSubscriber(event = ReceivePacketEvent.class)
+    private void onPacketReceived(ReceivePacketEvent event) {
+        if (!enabled.getValue()) return;
 
-    // TODO: impl after add packet receive
+        if (event.getData().getPacket() instanceof ClientboundContainerClosePacket) event.cancel();
+    }
 }

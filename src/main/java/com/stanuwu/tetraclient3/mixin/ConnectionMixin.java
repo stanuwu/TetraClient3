@@ -3,9 +3,13 @@ package com.stanuwu.tetraclient3.mixin;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.stanuwu.tetraclient3.events.EventManager;
+import com.stanuwu.tetraclient3.events.impl.ReceivePacketEvent;
 import com.stanuwu.tetraclient3.events.impl.SendPacketEvent;
+import com.stanuwu.tetraclient3.events.impl.context.ReceivePacketContext;
 import com.stanuwu.tetraclient3.events.impl.context.SendPacketContext;
+import com.stanuwu.tetraclient3.util.PacketUtil;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,5 +25,18 @@ public class ConnectionMixin {
         EventManager.getInstance().fireEvent(event);
         packetLocalRef.set(event.getData().getPacket());
         if (event.isCancelled()) ci.cancel();
+    }
+
+    @Inject(method = "channelRead0(Lio/netty/channel/ChannelHandlerContext;Lnet/minecraft/network/protocol/Packet;)V", at = @At("HEAD"), cancellable = true)
+    private void channelRead0(ChannelHandlerContext ctx, Packet<?> packet, CallbackInfo ci, @Local(name = "packet", argsOnly = true) LocalRef<Packet<?>> packetLocalRef) {
+        ReceivePacketEvent event = new ReceivePacketEvent(new ReceivePacketContext((Connection) (Object) this, packet, ctx));
+        EventManager.getInstance().fireEvent(event);
+        packetLocalRef.set(event.getData().getPacket());
+        if (event.isCancelled()) ci.cancel();
+    }
+
+    @Inject(method = "tick", at = @At("HEAD"))
+    private void tick(CallbackInfo ci) {
+        PacketUtil.tick((Connection) (Object) this);
     }
 }

@@ -4,6 +4,7 @@ import com.stanuwu.tetraclient3.module.impl.config.FilesModule;
 import com.stanuwu.tetraclient3.module.impl.hud.WaifuModule;
 import com.stanuwu.tetraclient3.module.impl.hud.WatermarkModule;
 import com.stanuwu.tetraclient3.module.impl.misc.ClientSpoofModule;
+import com.stanuwu.tetraclient3.module.impl.misc.NoGuiCloseModule;
 import com.stanuwu.tetraclient3.module.impl.movement.ClipModule;
 import com.stanuwu.tetraclient3.module.impl.movement.FlightModule;
 import com.stanuwu.tetraclient3.module.impl.movement.JesusModule;
@@ -47,6 +48,12 @@ public class ModuleManager {
      * Register modules here.
      */
     private ModuleManager() {
-        reg(new PlayerEspModule(), new FlightModule(), new NoFallModule(), new JesusModule(), new ClipModule(), new ClientSpoofModule(), new WatermarkModule(), new WaifuModule(), new FilesModule(this));
+        reg(
+                new PlayerEspModule(),
+                new FlightModule(), new NoFallModule(), new JesusModule(), new ClipModule(),
+                new ClientSpoofModule(), new NoGuiCloseModule(),
+                new WatermarkModule(), new WaifuModule(),
+                new FilesModule(this)
+        );
     }
 }
