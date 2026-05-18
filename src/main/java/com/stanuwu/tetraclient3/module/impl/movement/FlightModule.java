@@ -4,18 +4,27 @@ import com.stanuwu.tetraclient3.config.CheckboxValue;
 import com.stanuwu.tetraclient3.config.EnumValue;
 import com.stanuwu.tetraclient3.config.FloatSliderValue;
 import com.stanuwu.tetraclient3.events.EventSubscriber;
+import com.stanuwu.tetraclient3.events.impl.PostTickEvent;
 import com.stanuwu.tetraclient3.events.impl.PreTickEvent;
 import com.stanuwu.tetraclient3.module.AbstractModule;
 import com.stanuwu.tetraclient3.module.ModuleCategory;
+import com.stanuwu.tetraclient3.util.PacketUtil;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Abilities;
+import net.minecraft.world.phys.Vec3;
 
 public class FlightModule extends AbstractModule {
     private enum FlightMode {
         ABILITIES,
         JETPACK,
         VELOCITY,
-        POSITION
+        POSITION,
+        ELYTRA,
+        ELYTRA_BOOST,
+        MOUNT
     }
 
     public FlightModule() {
@@ -119,8 +128,74 @@ public class FlightModule extends AbstractModule {
                     doVelocityPositionAntiKick(player, !player.onGround());
                 }
             }
+
+            // Elytra Boost
+            case ELYTRA_BOOST -> {
+                if (event.getData().player == null) return;
+                LocalPlayer player = event.getData().player;
+                if (player.isFallFlying() && player.input.keyPresses.forward()) {
+                    Vec3 look = player.getLookAngle();
+
+                    Vec3 velocity = player.getDeltaMovement();
+
+                    player.setDeltaMovement(
+                            velocity.add(
+                                    look.x * 0.1 + (look.x * speed.getValue() - velocity.x) * 0.5,
+                                    look.y * 0.1 + (look.y * speed.getValue() - velocity.y) * 0.5,
+                                    look.z * 0.1 + (look.z * speed.getValue() - velocity.z) * 0.5
+                            )
+                    );
+                }
+            }
+
+            // Mount Fly
+            case MOUNT -> {
+                if (event.getData().player == null) return;
+                LocalPlayer player = event.getData().player;
+                Entity mount = player.getVehicle();
+                if (mount == null) return;
+                float yVel = 0;
+                if (player.input.keyPresses.jump()) yVel += speed.getValue();
+                if (player.input.keyPresses.shift()) yVel -= speed.getValue();
+                mount.setDeltaMovement(mount.getDeltaMovement().x, yVel, mount.getDeltaMovement().z);
+            }
         }
 
         lastMode = this.mode.getValue();
+    }
+
+    @EventSubscriber(event = PostTickEvent.class)
+    private void doPostTick(PostTickEvent event) {
+        switch (this.mode.getValue()) {
+            // Elytra Fly
+            case ELYTRA -> {
+                if (enabled.getValue()) {
+                    if (event.getData().player == null) return;
+                    LocalPlayer player = event.getData().player;
+
+                    if (player.onGround()) {
+                        return;
+                    }
+
+                    if (player.isFallFlying()) {
+                        PacketUtil.queuePacket(0, new ServerboundPlayerCommandPacket(
+                                player, ServerboundPlayerCommandPacket.Action.START_FALL_FLYING
+                        ));
+                    }
+
+                    player.setPose(Pose.STANDING);
+
+                    float yVel = 0;
+                    if (player.input.keyPresses.jump()) {
+                        yVel += speed.getValue();
+                        event.getData().options.keyJump.setDown(false);
+                    }
+                    if (player.input.keyPresses.shift()) {
+                        yVel -= speed.getValue();
+                    }
+                    player.setDeltaMovement(player.getDeltaMovement().x, yVel, player.getDeltaMovement().z);
+                }
+            }
+        }
     }
 }

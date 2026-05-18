@@ -20,6 +20,7 @@ fabricApi {
 repositories {
     mavenCentral()
     mavenLocal()
+    maven { url = "https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1" }
 }
 
 loom {
@@ -54,6 +55,9 @@ dependencies {
 
     // gson
     implementation 'com.google.code.gson:gson:2.14.0'
+
+    // dev auth
+    runtimeOnly "me.djtheredstoner:DevAuth-fabric:1.2.2"
 }
 
 processResources {
