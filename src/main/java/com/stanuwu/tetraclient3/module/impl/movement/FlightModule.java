@@ -20,7 +20,9 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Abilities;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
 
@@ -35,6 +37,7 @@ public class FlightModule extends AbstractModule {
         ELYTRA,
         ELYTRA_BOOST,
         MOUNT,
+        SPEAR_LEGIT,
         SPEAR
     }
 
@@ -45,13 +48,15 @@ public class FlightModule extends AbstractModule {
     private final CheckboxValue enabled = reg(new CheckboxValue("Enabled", false));
     private final CheckboxValue antiKick = reg(new CheckboxValue("Anti Kick", true));
     private final EnumValue<FlightMode> mode = reg(new EnumValue<>("Mode", FlightMode.ABILITIES, FlightMode.class));
-    private final FloatSliderValue speed = reg(new FloatSliderValue("Speed", 0.1f, 0.1f, 10f));
+    private final FloatSliderValue speed = reg(new FloatSliderValue("Speed", 0.1f, 0.1f, 10f, () -> !mode.getValue().equals(FlightMode.SPEAR_LEGIT)));
 
     private long delta = 0L;
     private boolean shouldDoAntiKick = false;
     private int didAntiKick = 0;
     private boolean lastState = enabled.getValue();
     private FlightMode lastMode = mode.getValue();
+
+    private int spoofedSlot = 0;
 
     private void doVelocityPositionAntiKick(LocalPlayer player, boolean isFlying) {
         if (shouldDoAntiKick && isFlying) {
@@ -171,6 +176,51 @@ public class FlightModule extends AbstractModule {
                 mount.setDeltaMovement(mount.getDeltaMovement().x, yVel, mount.getDeltaMovement().z);
             }
 
+            // Spear Fly no flags
+            case SPEAR_LEGIT -> {
+                if (event.getData().player == null) return;
+                LocalPlayer player = event.getData().player;
+                if (!enabled.getValue() || !player.input.keyPresses.jump()) return;
+
+                Item[] spears = {Items.WOODEN_SPEAR, Items.STONE_SPEAR, Items.COPPER_SPEAR, Items.GOLDEN_SPEAR, Items.IRON_SPEAR, Items.DIAMOND_SPEAR, Items.NETHERITE_SPEAR};
+
+                Inventory inv = player.getInventory();
+
+                int originalSlot = inv.getSelectedSlot();
+                int spearSlot = -1;
+
+                for (int i = 0; i < 9; i++) {
+                    ItemStack stack = inv.getItem(i);
+
+                    if (Arrays.stream(spears).anyMatch(stack::is)) {
+                        spearSlot = i;
+                        break;
+                    }
+                }
+
+                if (spearSlot == -1)
+                    return;
+
+                // Dummy swap slot
+                if (spearSlot == originalSlot) originalSlot = originalSlot == 8 ? 7 : 8;
+
+                int tick = player.tickCount % 2;
+
+                if (tick == 0) {
+                    if (spoofedSlot != spearSlot) {
+                        spoofedSlot = spearSlot;
+                        PacketUtil.sendImmediately(new ServerboundSetCarriedItemPacket(spearSlot));
+                    }
+                    PacketUtil.sendImmediately(new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.STAB, BlockPos.ZERO, Direction.DOWN));
+                    PacketUtil.sendImmediately(new ServerboundSwingPacket(InteractionHand.MAIN_HAND));
+                } else if (tick == 1) {
+                    if (spoofedSlot != originalSlot) {
+                        spoofedSlot = originalSlot;
+                        PacketUtil.sendImmediately(new ServerboundSetCarriedItemPacket(originalSlot));
+                    }
+                }
+            }
+
             // Spear Fly
             case SPEAR -> {
                 if (event.getData().player == null) return;
@@ -179,21 +229,37 @@ public class FlightModule extends AbstractModule {
 
                 Item[] spears = {Items.WOODEN_SPEAR, Items.STONE_SPEAR, Items.COPPER_SPEAR, Items.GOLDEN_SPEAR, Items.IRON_SPEAR, Items.DIAMOND_SPEAR, Items.NETHERITE_SPEAR};
 
-                InteractionHand hand = null;
+                Inventory inv = player.getInventory();
 
-                if (Arrays.stream(spears).anyMatch(s -> player.getMainHandItem().is(s)))
-                    hand = InteractionHand.MAIN_HAND;
+                int originalSlot = inv.getSelectedSlot();
+                int spearSlot = -1;
 
-                if (hand == null) return;
+                for (int i = 0; i < 9; i++) {
+                    ItemStack stack = inv.getItem(i);
 
-                int slot = player.getInventory().getSelectedSlot();
-                int newSlot = slot == 7 ? 7 : 8;
+                    if (Arrays.stream(spears).anyMatch(stack::is)) {
+                        spearSlot = i;
+                        break;
+                    }
+                }
+
+                if (spearSlot == -1)
+                    return;
+
+                // Dummy swap slot
+                if (spearSlot == originalSlot) originalSlot = originalSlot == 8 ? 7 : 8;
 
                 for (int i = 0; i < Math.ceil(speed.getValue()); i++) {
-                    PacketUtil.sendImmediately(new ServerboundSetCarriedItemPacket(slot));
+                    if (spoofedSlot != spearSlot) {
+                        spoofedSlot = spearSlot;
+                        PacketUtil.sendImmediately(new ServerboundSetCarriedItemPacket(spearSlot));
+                    }
                     PacketUtil.sendImmediately(new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.STAB, BlockPos.ZERO, Direction.DOWN));
-                    PacketUtil.sendImmediately(new ServerboundSwingPacket(hand));
-                    PacketUtil.sendImmediately(new ServerboundSetCarriedItemPacket(newSlot));
+                    PacketUtil.sendImmediately(new ServerboundSwingPacket(InteractionHand.MAIN_HAND));
+                    if (spoofedSlot != originalSlot) {
+                        spoofedSlot = originalSlot;
+                        PacketUtil.sendImmediately(new ServerboundSetCarriedItemPacket(originalSlot));
+                    }
                 }
             }
         }
