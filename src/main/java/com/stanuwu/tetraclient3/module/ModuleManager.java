@@ -11,11 +11,9 @@ import com.stanuwu.tetraclient3.module.impl.hud.WatermarkModule;
 import com.stanuwu.tetraclient3.module.impl.misc.ClientSpoofModule;
 import com.stanuwu.tetraclient3.module.impl.misc.NoGuiCloseModule;
 import com.stanuwu.tetraclient3.module.impl.misc.ResourcePackSpoofModule;
-import com.stanuwu.tetraclient3.module.impl.movement.ClipModule;
-import com.stanuwu.tetraclient3.module.impl.movement.FlightModule;
-import com.stanuwu.tetraclient3.module.impl.movement.JesusModule;
-import com.stanuwu.tetraclient3.module.impl.movement.NoFallModule;
+import com.stanuwu.tetraclient3.module.impl.movement.*;
 import com.stanuwu.tetraclient3.module.impl.render.PlayerEspModule;
+import com.stanuwu.tetraclient3.module.impl.world.TimeSpoofModule;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -57,7 +55,8 @@ public class ModuleManager {
         reg(
                 new ReachModule(), new ClickerModule(), new AimModule(), new TotemModule(),
                 new PlayerEspModule(),
-                new FlightModule(), new NoFallModule(), new JesusModule(), new ClipModule(),
+                new VelocityModule(), new SpeedModule(), new FlightModule(), new NoFallModule(), new JesusModule(), new ClipModule(),
+                new TimeSpoofModule(),
                 new DisablerModule(),
                 new WatermarkModule(), new WaifuModule(),
                 new ClientSpoofModule(), new NoGuiCloseModule(), new ResourcePackSpoofModule(),

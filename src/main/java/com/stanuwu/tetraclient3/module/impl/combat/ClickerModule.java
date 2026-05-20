@@ -36,8 +36,8 @@ public class ClickerModule extends AbstractModule {
     private final EnumValue<ClickType> type = reg(new EnumValue<>("Click Type", ClickType.PACKET, ClickType.class));
     public final CheckboxValue silent = reg(new CheckboxValue("Silent", false, () -> !type.getValue().equals(ClickType.INPUT)));
     public final CheckboxValue entityCheck = reg(new CheckboxValue("Entity Check", false, () -> type.getValue().equals(ClickType.INPUT)));
-    public final CheckboxValue blockCheck = reg(new CheckboxValue("Block Check", false));
-    public final CheckboxValue cancelBlock = reg(new CheckboxValue("Cancel Block", false));
+    public final CheckboxValue itemCheck = reg(new CheckboxValue("Item Check", false));
+    public final CheckboxValue cancelItem = reg(new CheckboxValue("Cancel Item", false));
 
     @EventSubscriber(event = PreTickEvent.class)
     private void doPreTick(PreTickEvent event) {
@@ -51,8 +51,8 @@ public class ClickerModule extends AbstractModule {
             switch (type.getValue()) {
                 case PACKET -> {
                     Entity hitEntity = event.getData().crosshairPickEntity;
-                    if (cancelBlock.getValue()) player.stopUsingItem();
-                    if (hitEntity != null && (!blockCheck.getValue() || !player.isBlocking())) {
+                    if (cancelItem.getValue()) player.stopUsingItem();
+                    if (hitEntity != null && (!itemCheck.getValue() || !player.isUsingItem())) {
                         PacketUtil.sendImmediately(new ServerboundAttackPacket(hitEntity.getId()));
                         if (silent.getValue()) {
                             PacketUtil.sendImmediately(new ServerboundSwingPacket(InteractionHand.MAIN_HAND));
@@ -65,15 +65,15 @@ public class ClickerModule extends AbstractModule {
                 }
                 case INPUT -> {
                     if (!entityCheck.getValue() || event.getData().crosshairPickEntity != null) {
-                        if (cancelBlock.getValue()) player.stopUsingItem();
+                        if (cancelItem.getValue()) player.stopUsingItem();
                         KeyMapping.click(event.getData().options.keyAttack.key);
                     }
 
                 }
                 case INTERACT -> {
                     Entity hitEntity = event.getData().crosshairPickEntity;
-                    if (cancelBlock.getValue()) player.stopUsingItem();
-                    if (hitEntity != null && (!blockCheck.getValue() || !player.isBlocking())) {
+                    if (cancelItem.getValue()) player.stopUsingItem();
+                    if (hitEntity != null && (!itemCheck.getValue() || !player.isUsingItem())) {
                         event.getData().gameMode.attack(player, hitEntity);
                         if (!silent.getValue()) player.swing(InteractionHand.MAIN_HAND);
                     }

@@ -52,11 +52,15 @@ public class TotemModule extends AbstractModule {
                 ItemStack stack = inventory.getItem(i);
 
                 if (!stack.isEmpty() && stack.is(Items.TOTEM_OF_UNDYING)) {
-                    if (mode.getValue().equals(TotemModes.LEGIT))
+                    if (mode.getValue().equals(TotemModes.LEGIT)) {
                         event.getData().setScreen(new InventoryScreen(player));
+                    }
                     int slot = i < 9 ? i + 36 : i;
                     gameMode.handleContainerInput(player.inventoryMenu.containerId, slot, 40, ContainerInput.SWAP, player);
-                    if (mode.getValue().equals(TotemModes.LEGIT)) player.closeContainer();
+                    if (mode.getValue().equals(TotemModes.LEGIT)) {
+                        player.closeContainer();
+                        player.setSprinting(false);
+                    }
                     break;
                 }
             }

@@ -7,7 +7,7 @@ import java.awt.*;
 import java.util.function.Supplier;
 
 public class ColorConfigValue extends AbstractConfigValue<Color> {
-    ColorConfigValue(String name, Color initial, @Nullable Supplier<Boolean> conditional) {
+    public ColorConfigValue(String name, Color initial, @Nullable Supplier<Boolean> conditional) {
         super(name, initial, conditional);
     }
 

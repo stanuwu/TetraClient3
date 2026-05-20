@@ -7,3 +7,6 @@ accessible method net/minecraft/network/Connection genericsFtw (Lnet/minecraft/n
 accessible method net/minecraft/client/Minecraft startAttack ()Z
 accessible field net/minecraft/client/KeyMapping key Lcom/mojang/blaze3d/platform/InputConstants$Key;
 accessible field net/minecraft/world/entity/LivingEntity attackStrengthTicker I
+accessible field net/minecraft/client/MouseHandler accumulatedDX D
+accessible field net/minecraft/client/MouseHandler accumulatedDY D
+accessible method net/minecraft/client/multiplayer/MultiPlayerGameMode startPrediction (Lnet/minecraft/client/multiplayer/ClientLevel;Lnet/minecraft/client/multiplayer/prediction/PredictiveAction;)V

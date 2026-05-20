@@ -10,11 +10,21 @@ import com.stanuwu.tetraclient3.module.AbstractModule;
 import com.stanuwu.tetraclient3.module.ModuleCategory;
 import com.stanuwu.tetraclient3.util.PacketUtil;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
+import net.minecraft.network.protocol.game.ServerboundSetCarriedItemPacket;
+import net.minecraft.network.protocol.game.ServerboundSwingPacket;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Abilities;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.Arrays;
 
 public class FlightModule extends AbstractModule {
     private enum FlightMode {
@@ -24,7 +34,8 @@ public class FlightModule extends AbstractModule {
         POSITION,
         ELYTRA,
         ELYTRA_BOOST,
-        MOUNT
+        MOUNT,
+        SPEAR
     }
 
     public FlightModule() {
@@ -158,6 +169,32 @@ public class FlightModule extends AbstractModule {
                 if (player.input.keyPresses.jump()) yVel += speed.getValue();
                 if (player.input.keyPresses.shift()) yVel -= speed.getValue();
                 mount.setDeltaMovement(mount.getDeltaMovement().x, yVel, mount.getDeltaMovement().z);
+            }
+
+            // Spear Fly
+            case SPEAR -> {
+                if (event.getData().player == null) return;
+                LocalPlayer player = event.getData().player;
+                if (!enabled.getValue() || !player.input.keyPresses.jump()) return;
+
+                Item[] spears = {Items.WOODEN_SPEAR, Items.STONE_SPEAR, Items.COPPER_SPEAR, Items.GOLDEN_SPEAR, Items.IRON_SPEAR, Items.DIAMOND_SPEAR, Items.NETHERITE_SPEAR};
+
+                InteractionHand hand = null;
+
+                if (Arrays.stream(spears).anyMatch(s -> player.getMainHandItem().is(s)))
+                    hand = InteractionHand.MAIN_HAND;
+
+                if (hand == null) return;
+
+                int slot = player.getInventory().getSelectedSlot();
+                int newSlot = slot == 7 ? 7 : 8;
+
+                for (int i = 0; i < Math.ceil(speed.getValue()); i++) {
+                    PacketUtil.sendImmediately(new ServerboundSetCarriedItemPacket(slot));
+                    PacketUtil.sendImmediately(new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.STAB, BlockPos.ZERO, Direction.DOWN));
+                    PacketUtil.sendImmediately(new ServerboundSwingPacket(hand));
+                    PacketUtil.sendImmediately(new ServerboundSetCarriedItemPacket(newSlot));
+                }
             }
         }
 

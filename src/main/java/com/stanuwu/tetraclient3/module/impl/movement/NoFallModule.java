@@ -26,8 +26,8 @@ public class NoFallModule extends AbstractModule {
     @EventSubscriber(event = PreTickEvent.class)
     private void doPreTick(PreTickEvent event) {
         if (!enabled.getValue()) return;
-        if (event.getData().player == null) return;
         LocalPlayer player = event.getData().player;
+        if (player == null) return;
 
         switch (mode.getValue()) {
             case VELOCITY -> {
